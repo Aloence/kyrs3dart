@@ -1,31 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:schedule_app/admin/admin_route_edit.dart';
+import 'package:schedule_app/graph_ql_services/graph_route_service.dart';
+import 'package:schedule_app/graph_ql_services/graph_types.dart';
 
 
-class Route {
-  final int id;
-  final String start;
-  final String end;
 
-  Route({required this.id, required this.start, required this.end});
+class RouteListScreen extends StatefulWidget {
+  const RouteListScreen({super.key});
+
+  @override
+  State<RouteListScreen> createState() => _RouteListState();
 }
 
-class RouteListScreen extends StatelessWidget {
-  final List<Route> routes = [
-    Route(id: 1, start: 'Остановка A', end: 'Остановка B'),
-    Route(id: 2, start: 'Остановка C', end: 'Остановка D'),
-    Route(id: 3, start: 'Остановка E', end: 'Остановка F'),
-    // Добавьте больше маршрутов здесь
-  ];
+class _RouteListState extends State<RouteListScreen>
+    with SingleTickerProviderStateMixin {
+  
+  
+  final RouteGraphQLService _graphQLService = RouteGraphQLService();
+  
+  List<RouteModel>? _routes;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  void _load() async {
+    _routes = null;
+    List<RouteModel> routes = await _graphQLService.getRoutes();
+    setState(() => _routes = routes);
+  }
 
   void _addRoute(){
-
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NewRouteScreen(),
+      ),
+    );
   }
   void _editRoute(context,int id) {
       Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => NewRouteScreen(),
+        builder: (context) => NewRouteScreen(id: id),
       ),
     );
     // Логика для редактирования маршрута
@@ -48,7 +67,7 @@ class RouteListScreen extends StatelessWidget {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: routes.length,
+              itemCount: _routes!.length,
               itemBuilder: (context, index) {
                 return Card(
                   margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -57,12 +76,12 @@ class RouteListScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Маршрут ${routes[index].id}', // Название маршрута
+                          'Маршрут ${_routes![index].name}', // Название маршрута
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 4), // Отступ между строками
                         Text(
-                          ' ${routes[index].start} - ${routes[index].end}', // Начало маршрута
+                          ' ${_routes![index].start.name} - ${_routes![index].end.name}', // Начало маршрута
                           style: TextStyle(fontSize: 16),
                         ),
                       ],
@@ -73,7 +92,7 @@ class RouteListScreen extends StatelessWidget {
                         IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),
                           onPressed: () {
-                            _deleteRoute(routes[index].id);
+                            // _deleteRoute(_routes[index].id);
                           },
                           tooltip: 'Удалить',
                         ),
@@ -81,7 +100,7 @@ class RouteListScreen extends StatelessWidget {
                           icon: Icon(Icons.edit, color: Colors.blue),
                           onPressed: () {
             
-                            _editRoute(context,routes[index].id);
+                            _editRoute(context,_routes![index].id);
                           },
                           tooltip: 'Редактировать',
                         ),

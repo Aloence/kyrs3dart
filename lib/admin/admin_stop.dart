@@ -1,47 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:schedule_app/admin/admin_stop_edit.dart';
+import 'package:schedule_app/graph_ql_services/graph_types.dart';
+import 'package:schedule_app/graph_ql_services/graphql_st_service.dart';
 
 
-class Stop {
-  final int id;
-  final String name;
 
-  Stop({required this.id, required this.name});
+class StopListScreen extends StatefulWidget {
+  const StopListScreen({super.key});
+
+  @override
+  State<StopListScreen> createState() => _StopListState();
 }
 
-class AdminStopScreen extends StatelessWidget {
-  final List<Stop> stops = [
-    Stop(id: 1, name: 'Остановка A'),
-    Stop(id: 2, name: 'Остановка B'),
-    Stop(id: 3, name: 'Остановка C'),
-    // Добавьте больше остановок здесь
-  ];
+class _StopListState extends State<StopListScreen>
+    with SingleTickerProviderStateMixin {
+  
+  final StopGraphQLService _graphQLService = StopGraphQLService();
+  
+  List<StopModel>? _stops;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  void _load() async {
+    _stops = null;
+    List<StopModel> stops = await _graphQLService.getStops();
+    setState(() => _stops = stops);
+  }
 
   void _addStop(context){
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => StopEditScreen(name:""),
+        builder: (context) => StopEditScreen(stop:null),
       ),
     );
   }
-  void _editStop(context, int id,String name) {
+  void _editStop(context,StopModel stop) {
       Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => StopEditScreen(name:name),
+        builder: (context) => StopEditScreen(stop:stop),
       ),
     );
-    
-    // Логика для редактирования остановки
-    print('Редактирование остановки с id: $id');
   }
-
   void _deleteStop(int id) {
     // Логика для удаления остановки
     print('Удаление остановки с id: $id');
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -51,7 +62,7 @@ class AdminStopScreen extends StatelessWidget {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: stops.length,
+              itemCount: _stops!.length,
               itemBuilder: (context, index) {
                 return ListTile(
                   title: Row(
@@ -59,21 +70,21 @@ class AdminStopScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          stops[index].name,
+                          _stops![index].name,
                           style: TextStyle(fontSize: 18),
                         ),
                       ),
                       IconButton(
                         icon: Icon(Icons.delete, color: Colors.red),
                         onPressed: () {
-                          _deleteStop(stops[index].id);
+                          _deleteStop(_stops![index].id);
                         },
                         tooltip: 'Удалить',
                       ),
                       IconButton(
                         icon: Icon(Icons.edit, color: Colors.blue),
                         onPressed: () {
-                          _editStop(context,stops[index].id,"mock");
+                          _editStop(context,_stops![index]);
                         },
                         tooltip: 'Редактировать',
                       ),
@@ -105,48 +116,3 @@ class AdminStopScreen extends StatelessWidget {
   }
 }
 
-class StopEditScreen extends StatelessWidget {
-  final String name; // Переменная для хранения имени
-
-  StopEditScreen({required this.name}); // Конструктор для получения значения name
-
-  final TextEditingController _controller = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    // Устанавливаем текст в текстовом поле
-    _controller.text = name;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Ввод Имени'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _controller, // Привязка контроллера к текстовому полю
-              decoration: InputDecoration(
-                labelText: 'Имя',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 16), // Отступ между текстовым полем и кнопкой
-            ElevatedButton(
-              onPressed: () {
-                // Логика при нажатии на кнопку
-                String enteredName = _controller.text; // Получаем текст из текстового поля
-                print('Введенное имя: $enteredName'); // Здесь можно добавить логику обработки имени
-              },
-              child: Text('Сохранить'),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50), // Ширина кнопки на весь экран
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

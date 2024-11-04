@@ -1,0 +1,42 @@
+back:(
+    route:name
+    schedule:
+)
+
+admin:
+stops:
+getAllStops{
+    id
+    name
+}
+getStopById(id){
+    name
+    routes?
+}
+createStop(name?stop)
+editStop(id,stop)
+deleteStop(id)
+
+routes:
+getAllRoutes{
+    id:
+    name:
+    start
+    end
+}
+getRouteById(id){
+    name
+    stops
+}
+editRoute(id,route)
+createRoute(route)
+deleteRoute(id)
+где route{
+    name
+    stops[]
+}
+
+
+user:
+
+

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:schedule_app/admin/admin_buses.dart';
 import 'package:schedule_app/admin/admin_routes.dart';
 import 'package:schedule_app/admin/admin_schedule.dart';
 import 'package:schedule_app/admin/admin_stop.dart';
@@ -18,10 +19,10 @@ class AdminPanel extends StatelessWidget {
           crossAxisCount: 2,
           childAspectRatio: 1.5,
           children: [
-            _buildButton(context, 'Остановки',  AdminStopScreen()),
+            _buildButton(context, 'Остановки',  StopListScreen()),
             _buildButton(context, 'Маршруты', RouteListScreen()),
-            _buildButton(context, 'Расписания', AdminScheduleScreen()),
-            _buildButton(context, 'Автобусы', const BusesScreen()),
+            _buildButton(context, 'Расписания', ScheduleListScreen()),
+            _buildButton(context, 'Автобусы', BusListScreen()),
           ],
         ),
       ),

@@ -1,24 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:schedule_app/graph_ql_services/graph_types.dart';
+import 'package:schedule_app/graph_ql_services/graphql_st_service.dart';
 
-class Stop {
-  final int id;
-  final int bus;
-  final String name;
+class StopScreen extends StatefulWidget {
+  const StopScreen({super.key});
 
-  Stop({required this.id, required this.bus, required this.name});
+  @override
+  State<StopScreen> createState() => _StopScreenState();
 }
 
-class StopListScreen extends StatelessWidget {
-  final List<Stop> stops = [
-    Stop(id: 1, bus: 101, name: 'Финиш A'),
-    Stop(id: 2, bus: 102, name: 'Финиш C'),
-    Stop(id: 3, bus: 103, name: 'Финиш E'),
-    // Добавьте больше автобусов здесь
-  ];
+class _StopScreenState extends State<StopScreen>
+    with SingleTickerProviderStateMixin {
+  final StopGraphQLService _graphQLService = StopGraphQLService();
 
-   StopListScreen({super.key});
+  List<StopModel>? _stops;
 
- 
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  void _load() async {
+    _stops = null;
+    List<StopModel> stops = await _graphQLService.getStops();
+    setState(() => _stops = stops);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +34,7 @@ class StopListScreen extends StatelessWidget {
         title: Text('Список Остановок'),
       ),
       body: ListView.builder(
-        itemCount: stops.length,
+        itemCount: _stops!.length,
         itemBuilder: (context, index) {
           return Card(
             // margin: EdgeInsets.all(8.0),
@@ -42,7 +50,8 @@ class StopListScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(Icons.directions_bus),
-                        Text('${stops[index].bus}', style: TextStyle(fontSize: 18)),
+                        Text('mock pozor', style: TextStyle(fontSize: 18)),
+                        // Text('${_stops![index].bus}', style: TextStyle(fontSize: 18)),
                         // SizedBox(height: 4),
                       ],
                     ),
@@ -75,7 +84,7 @@ class StopListScreen extends StatelessWidget {
                       
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${stops[index].name}', style: TextStyle(fontSize: 16)),
+                        Text('${_stops![index].name}', style: TextStyle(fontSize: 16)),
                       ],
                       
                     ),
