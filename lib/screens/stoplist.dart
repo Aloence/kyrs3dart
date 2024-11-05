@@ -60,8 +60,8 @@ class _StopScreenState extends State<StopScreen>
                   ),
                   // VERTICAL DIVIDER
                   // Container(
-                  //   width: 3, // Ширина разделителя
-                  //   height: 40, // Высота разделителя
+                  //   width: 3, 
+                  //   height: 40,
                   //   color: Colors.grey,
                   // ),
 
@@ -115,7 +115,7 @@ class StopBusScreen extends StatelessWidget {
     Bus(number: 101, finish: 'Станция A'),
     Bus(number: 102, finish: 'Станция B'),
     Bus(number: 103, finish: 'Станция C'),
-    // Добавьте больше автобусов здесь
+   
   ];
 
   @override
@@ -143,9 +143,9 @@ class StopBusScreen extends StatelessWidget {
                 ),
               ],
             ),
-            trailing: Icon(Icons.arrow_forward), // Иконка стрелочки
+            trailing: Icon(Icons.arrow_forward), 
             onTap: () {
-              // Действие при нажатии на элемент списка (если нужно)
+             
               print('Нажат автобус номер ${buses[index].number}');
             },
           );

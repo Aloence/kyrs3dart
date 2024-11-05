@@ -24,42 +24,35 @@ class _RouteSelectionScreenState extends State<NewScheduleScreen> {
   List<SchedulStopModel>  _schedule = [];
   int? _selectedRouteId;
   List<StopModel> _stops = [];
+  
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _startController = TextEditingController();
   final TextEditingController _endController = TextEditingController();
   List<TextEditingController> _controllers = [];
   
-  void _loadRoute(RouteModel route,int kost) async{
-    if(kost==1){
-      print("kost1");
-      List<RouteModel> filteredRoutes = _availableRoutes.where(
-        (routt) => routt.id == route.id).toList();
-      _loadRoute(filteredRoutes[0],0);
-    }else{
-      print("kost2");
+  void _loadRoute(RouteModel route) async{
+    // #kost
       // тут еще можно проверить грузился ли он до этого
       int routeIndex = _availableRoutes.indexOf(route);
       print(routeIndex);
       RouteModel new_route = await _routeGraphQLService.getRouteById(id:route.id);
-      print('dab');
       _availableRoutes[routeIndex] = new_route;
       setState(() {
         _selectedRoute = new_route;
       });
-      print('da?');
 
       // #kost надо переделать чтобы рисовалось не из _selectedRoute а из schedule или стопс
       _stops = _selectedRoute!.stops ?? [];
       // _schedule = List.generate(_stops.length,()=>)
       _schedule = _stops.map((stop) {
+        // #kost
         return SchedulStopModel(id: 123, time:"",stop:stop);
       }).toList();
-      
+
       // _schedule = List.
-      _controllers = List.generate(_stops.length, (index) => TextEditingController());
+      _controllers = List.generate(_schedule.length, (index) => TextEditingController());
     }
     
-  }
 
   
   void _loadRoutes() async {
@@ -100,10 +93,28 @@ class _RouteSelectionScreenState extends State<NewScheduleScreen> {
     _nameController.text =schedule.name;
     _startController.text = schedule.start;
     _endController.text = schedule.end;
+
+
+        // #kost
+    List<RouteModel> filteredRoutes = _availableRoutes.where(
+        (route) => route.id == schedule.route.id).toList();
+    setState(() {
+        _selectedRoute = filteredRoutes[0];
+    });
+    // #kost
+    setState(() {
+      _schedule = schedule.schedule!;
+    });
+    _controllers = List.generate(_schedule.length, (index) => TextEditingController());
+    
+
+
+
+
     // _controllers
     print('norm');
 
-    // _loadRoute(schedule.route, 1);
+    // _loadRoute(schedule.route);
     
   }
   @override
@@ -140,9 +151,7 @@ class _RouteSelectionScreenState extends State<NewScheduleScreen> {
               hint: Text('Выберите маршрут'),
               value: _selectedRoute,
               onChanged: (RouteModel? newValue) {
-                setState(() {
-                  _loadRoute(newValue!,0);
-                });
+                _loadRoute(newValue!);
               },
               items: _availableRoutes.map((RouteModel route) {
                 return DropdownMenuItem<RouteModel>(
@@ -159,13 +168,13 @@ class _RouteSelectionScreenState extends State<NewScheduleScreen> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: _stops.length,
+                  itemCount: _schedule.length,
                   itemBuilder: (context, index) {
                     return ListTile(
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(_stops[index].name),
+                          Text(_schedule[index].stop.name),
                           Container(
                             width: 100, // Фиксированная ширина для поля ввода
                             child: TextField(

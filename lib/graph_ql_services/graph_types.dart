@@ -24,7 +24,7 @@ class RouteModel {
   
   final StopModel start;
   final StopModel end;
-  final List<StopModel>? stops;
+  List<StopModel>? stops;
 
   RouteModel({
     required this.id,
@@ -79,6 +79,13 @@ class ScheduleModel {
   final RouteModel route;
   final List<SchedulStopModel>? schedule;
 
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true; // Проверка на идентичность
+    if (other is! ScheduleModel) return false; // Проверка на тип
+    return id == other.id; // Сравнение по ID
+  }
   ScheduleModel({
     required this.start,
     required this.end,

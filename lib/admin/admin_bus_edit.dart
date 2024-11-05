@@ -46,10 +46,13 @@ class _BusEditScreenState extends State<NewBusScreen> {
     
     List<ScheduleModel> filteredSchedule = _availableSchedules.where(
       (schedule) => schedule.id == bus.schedule.id).toList();
-    
+    print('tesst');
+    print(filteredSchedule[0]==bus.schedule);
     setState(() {
       // #kost надо чтобы одно возвроащалсь а не список
-      _selectedSchedule = filteredSchedule[0];
+      
+      // _selectedSchedule = filteredSchedule[0];
+      _selectedSchedule = bus.schedule;
     });
     
 

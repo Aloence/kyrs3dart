@@ -14,12 +14,10 @@ class BusListScreen extends StatelessWidget {
     Bus(id: 1, number: 101, start: 'Станция A', finish: 'Станция B'),
     Bus(id: 2, number: 102, start: 'Станция C', finish: 'Станция D'),
     Bus(id: 3, number: 103, start: 'Станция E', finish: 'Станция F'),
-    // Добавьте больше автобусов здесь
   ];
 
   Future<List<Map<String, dynamic>>> fetchSch() async {
-    // Симуляция получения данных (обычно здесь будет ваш API-запрос)
-    // await Future.delayed(Duration(seconds: 2)); // Имитация задержки
+    // kost
     return [
       {
         'id': 1,
@@ -71,8 +69,8 @@ class BusListScreen extends StatelessWidget {
                   ),
                   // VERTICAL DIVIDER
                   // Container(
-                  //   width: 3, // Ширина разделителя
-                  //   height: 40, // Высота разделителя
+                  //   width: 3, 
+                  //   height: 40,
                   //   color: Colors.grey,
                   // ),
                   Expanded(
@@ -93,9 +91,9 @@ class BusListScreen extends StatelessWidget {
                       child:IconButton(
                       icon: Icon(Icons.arrow_forward),
                       onPressed: () async {
-                      // Вызов функции fetch_sch и ожидание результата
+                      
                       List<Map<String, dynamic>> sch = await fetchSch();
-                      // Переход на SchListScreen с полученными данными
+                      
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -138,7 +136,7 @@ class SchListScreen extends StatelessWidget {
   //     'stop': {'stop_id': 103, 'stop_name': 'Станция C'},
   //     'time': '11:00',
   //   },
-  //   // Добавьте больше элементов здесь
+  //   
   // ];
 
   @override
@@ -151,25 +149,25 @@ class SchListScreen extends StatelessWidget {
         itemCount: sch.length,
         itemBuilder: (context, index) {
           return ListTile(
-            leading: Icon(Icons.circle), // Маркер списка
+            leading: Icon(Icons.circle), 
             title: GestureDetector(
-              // onTap: () => func1(sch[index]['id']), // Обработка нажатия на title
+              // onTap: () => func1(sch[index]['id']), 
               child: Text(
                 sch[index]['stop']['stop_name'],
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
             subtitle: GestureDetector(
-              // onTap: () => func1(sch[index]['id']), // Обработка нажатия на subtitle
+              // onTap: () => func1(sch[index]['id']),
               child: Text(
                 sch[index]['time'],
                 style: TextStyle(fontSize: 16),
               ),
             ),
             trailing: IconButton(
-              icon: Icon(Icons.arrow_forward), // Стрелочка в конце
+              icon: Icon(Icons.arrow_forward), 
           
-              onPressed: () => {}, // Обработка нажатия на стрелку
+              onPressed: () => {}, 
             ),
           );
         },

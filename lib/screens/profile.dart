@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
-  final String avatarUrl = 'https://example.com/avatar.png'; // URL аватарки
-  final String username = 'user123'; // Логин
-  final String fullName = 'Иван Иванов'; // Имя
-  final double balance = 150.75; // Баланс
+  final String avatarUrl = 'https://example.com/avatar.png'; 
+  final String username = 'user123'; 
+  final String fullName = 'Иван Иванов'; 
+  final double balance = 150.75; 
 
   @override
   Widget build(BuildContext context) {
@@ -21,28 +21,28 @@ class ProfileScreen extends StatelessWidget {
             Row(
               children:[
                 CircleAvatar(
-                  radius: 50, // Радиус аватарки
+                  radius: 50,
                   child: Icon(
-                    Icons.person, // Иконка пользователя
-                    size: 75, // Размер иконки
-                    color: Colors.white, // Цвет иконки
-                  ), // Загрузка изображения по URL
+                    Icons.person,
+                    size: 75, 
+                    color: Colors.white, 
+                  ), 
                 ),
                 Expanded(child:  
                 Column(children: [
-                  SizedBox(height: 16), // Отступ между аватаркой и текстом
+                  SizedBox(height: 16), 
                   Text(
                     fullName,
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 8), // Отступ
+                  SizedBox(height: 8),
                   Text(
                     username,
                     style: TextStyle(fontSize: 18, color: Colors.grey),
                   ),
-                  SizedBox(height: 16), // Отступ
+                  SizedBox(height: 16),
                   Text(
-                    'Баланс: \$${balance.toStringAsFixed(2)}', // Форматирование баланса до 2 знаков после запятой
+                    'Баланс: \$${balance.toStringAsFixed(2)}', 
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],))
@@ -54,12 +54,12 @@ class ProfileScreen extends StatelessWidget {
               Center(
                 child:   ElevatedButton(
               onPressed: () {
-                // Действие при нажатии на кнопку "Выйти"
-                print('Выход из профиля'); // Здесь можно добавить логику выхода
+                
+                print('Выход из профиля'); 
               },
               child: Text('Выйти'),
               // style: ElevatedButton.styleFrom(
-              //   minimumSize: Size(double.infinity, 50), // Ширина кнопки на весь экран
+              //   minimumSize: Size(double.infinity, 50), 
               // ),
             ),
               )

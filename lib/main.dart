@@ -27,9 +27,8 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0; // Индекс выбранного экрана
+  int _selectedIndex = 0; 
 
-  // Список экранов
   final List<Widget> _screens = [
     // BusListScreen(),
     // StopScreen(),
@@ -42,7 +41,7 @@ class _MainScreenState extends State<MainScreen> {
   void _onItemTapped(int index) {
     
     setState(() {
-      _selectedIndex = index; // Обновление выбранного индекса
+      _selectedIndex = index; 
     });
   }
 
@@ -52,7 +51,7 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: Text('Приложение с Нижним Меню'),
       ),
-      body: _screens[_selectedIndex], // Отображение выбранного экрана
+      body: _screens[_selectedIndex], 
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           
