@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:schedule_app/graph_ql_services/graph_bus_service.dart';
-import 'package:schedule_app/graph_ql_services/graph_sched_service.dart';
+import 'package:schedule_app/graph_ql_service.dart';
 import 'package:schedule_app/graph_ql_services/graph_types.dart';
 
-class NewBusScreen extends StatefulWidget {
-  int? id;
-  NewBusScreen({this.id});
+class BusEditScreen extends StatefulWidget {
+  int? busId;
+  BusEditScreen({this.busId});
 
   @override
   _BusEditScreenState createState() => _BusEditScreenState();
 }
 
-class _BusEditScreenState extends State<NewBusScreen> {
+class _BusEditScreenState extends State<BusEditScreen> {
 
-  final BusGraphQLService  _graphQLService = BusGraphQLService();
-  final ScheduleGraphQLService _scheduleGraphQLService = ScheduleGraphQLService();
+  final GraphQLService _graphQLService = GraphQLService();
 
   ScheduleModel? _selectedSchedule;
   List<ScheduleModel> _availableSchedules=[]; 
@@ -22,56 +20,57 @@ class _BusEditScreenState extends State<NewBusScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   
-  
-  void _loadSchedules() async {
+  @override
+  void initState() {
+    super.initState();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await _loadSchedules();
+    if (widget.busId != null) {
+      await _loadBus(widget.busId!); 
+    }
+  }
+  Future<void> _loadSchedules() async {
     _availableSchedules = [];
-    List<ScheduleModel> availableSchedules = await _scheduleGraphQLService.getSchedules();
+    List<ScheduleModel> availableSchedules = await _graphQLService.getSchedules();
     setState(() => _availableSchedules = availableSchedules);
+  }
+
+  Future<void> _loadBus(int busId) async{
+    BusModel bus = await _graphQLService.getBusById(busId: busId);
+
+    _nameController.text =bus.name;
+    _priceController.text = bus.price.toString();
+
+    // #kost или нет?
+    List<ScheduleModel> filteredSchedule = _availableSchedules.where(
+      (schedule) => schedule.id == bus.schedule.id).toList();
+
+    setState(() {
+      _selectedSchedule = filteredSchedule[0];
+    });
+    
+
   }
 
   BusInput _toBusInput(){
     return BusInput(
       name: _nameController.text, 
-      price: 
+      price: 123,
       // #kost
-      double.parse(_priceController.text), 
-      scheduleId: _selectedSchedule!.id,
+      // double.parse(_priceController.text), 
+      scheduleId: _selectedSchedule!.id!,
       );
   }
 
-  void _loadBus(int busId) async{
-    BusModel bus = await _graphQLService.getBusById(busId: busId);
-    _nameController.text =bus.name;
-    _priceController.text = bus.price.toString();
-    
-    List<ScheduleModel> filteredSchedule = _availableSchedules.where(
-      (schedule) => schedule.id == bus.schedule.id).toList();
-    print('tesst');
-    print(filteredSchedule[0]==bus.schedule);
-    setState(() {
-      // #kost надо чтобы одно возвроащалсь а не список
-      
-      // _selectedSchedule = filteredSchedule[0];
-      _selectedSchedule = bus.schedule;
-    });
-    
-
-  }
-  void _createBus() async {
+  Future<void> _createBus() async {
     BusInput busInput = _toBusInput();
     await _graphQLService.createBus(busInput: busInput);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadSchedules();
-    if (widget.id != null) {
-      print('iiooo');
-      print(widget.id);
-       _loadBus(widget.id!);
-    }
-  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,7 +114,7 @@ class _BusEditScreenState extends State<NewBusScreen> {
               onPressed: _createBus,
               child: Text('Сохранить'),
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50), // Кнопка на всю ширину
+                minimumSize: Size(double.infinity, 50),
               ),
             ),
           ],

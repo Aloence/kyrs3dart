@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:schedule_app/admin/admin_bus_edit.dart';
+import 'package:schedule_app/admin/edit/admin_bus_edit.dart';
 import 'package:schedule_app/graph_ql_services/graph_bus_service.dart';
 import 'package:schedule_app/graph_ql_services/graph_types.dart';
+
 
 
 class BusListScreen extends StatefulWidget {
@@ -16,16 +17,19 @@ class _BusListState extends State<BusListScreen>
   
   
   final BusGraphQLService _graphQLService = BusGraphQLService();
-  // List<RouteModel>? _routes;
   List<BusModel>? _buses;
 
   @override
   void initState() {
     super.initState();
-    _load();
+    _initialize();
   }
 
-  void _load() async {
+  Future<void> _initialize() async {
+    await _loadBuses();
+  }
+
+  Future<void> _loadBuses() async {
     _buses = null;
     List<BusModel> buses = await _graphQLService.getBuses();
     setState(() => _buses = buses);
@@ -34,7 +38,7 @@ class _BusListState extends State<BusListScreen>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => NewBusScreen(id:busId),
+        builder: (context) => BusEditScreen(busId:busId),
       ),
     );
     // Логика для редактирования автобуса
@@ -45,12 +49,12 @@ class _BusListState extends State<BusListScreen>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => NewBusScreen(),
+        builder: (context) => BusEditScreen(),
       ),
     );
   }
   void _deleteBus(int id) {
-    // Логика для удаления автобуса
+   
     print('Удаление автобуса с id: $id');
   }
 
@@ -64,7 +68,7 @@ class _BusListState extends State<BusListScreen>
         children: [
           Expanded(
             child:ListView.builder(
-            // itemCount: _buses!.length,
+            itemCount: _buses!.length,
             itemBuilder: (context, index) {
               return Card(
                 margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -73,27 +77,27 @@ class _BusListState extends State<BusListScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Автобус №${_buses![index].name}', // Номер автобуса
+                        'Автобус №${_buses![index].name}', 
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 4),
                       Text(
-                        '${_buses![index].schedule.route.start.name} - ${_buses![index].schedule.route.end.name}', // Начало и конец маршрута
+                        '${_buses![index].schedule.route!.start!.name} - ${_buses![index].schedule.route!.end!.name}',
                         style: TextStyle(fontSize: 16),
                       ),
                       Text(
                         'Расписание: №${_buses![index].schedule.name},'
-                        + '${_buses![index].schedule.start} - ${_buses![index].schedule.end}', // Номер расписания, начало и конец
+                        + '${_buses![index].schedule.start} - ${_buses![index].schedule.end}',
                         style: TextStyle(fontSize: 16),
                       ),
                       Text(
-                        'Цена: ${_buses![index].price} руб.', // Цена
+                        'Цена: ${_buses![index].price} руб.',
                         style: TextStyle(fontSize: 16),
                       ),
                     ],
                   ),
                   trailing: Row(
-                    mainAxisSize: MainAxisSize.min, // Уменьшаем размер Row
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
                         icon: Icon(Icons.delete, color: Colors.red),
@@ -122,7 +126,7 @@ class _BusListState extends State<BusListScreen>
             onPressed: _addBus, 
             child: Text('Добавить Автобус'),
             style: ElevatedButton.styleFrom(
-              minimumSize: Size(double.infinity, 50), // Ширина кнопки на весь экран
+              minimumSize: Size(double.infinity, 50), 
             ),
           ),
         ),

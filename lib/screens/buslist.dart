@@ -1,43 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:schedule_app/graph_ql_service.dart';
+import 'package:schedule_app/graph_ql_services/graph_types.dart';
 
-class Bus {
-  final int id;
-  final int number;
-  final String start;
-  final String finish;
+class BusesListScreen extends StatefulWidget {
+  const BusesListScreen({super.key});
 
-  Bus({required this.id, required this.number, required this.start, required this.finish});
+  @override
+  _BusesListScreenState createState() => _BusesListScreenState();
 }
 
-class BusListScreen extends StatelessWidget {
-  final List<Bus> buses = [
-    Bus(id: 1, number: 101, start: 'Станция A', finish: 'Станция B'),
-    Bus(id: 2, number: 102, start: 'Станция C', finish: 'Станция D'),
-    Bus(id: 3, number: 103, start: 'Станция E', finish: 'Станция F'),
-  ];
+class _BusesListScreenState extends State<BusesListScreen>{
+  final GraphQLService _graphQLService = GraphQLService();
+  
+  List<BusModel>? _buses = [];
 
-  Future<List<Map<String, dynamic>>> fetchSch() async {
-    // kost
-    return [
-      {
-        'id': 1,
-        'stop': {'stop_id': 101, 'stop_name': 'Станция A'},
-        'time': '10:00',
-      },
-      {
-        'id': 2,
-        'stop': {'stop_id': 102, 'stop_name': 'Станция B'},
-        'time': '10:30',
-      },
-      {
-        'id': 3,
-        'stop': {'stop_id': 103, 'stop_name': 'Станция C'},
-        'time': '11:00',
-      },
-    ];
+  @override
+  void initState() {
+    super.initState();
+    _initialize();
   }
-   BusListScreen({super.key});
 
+  Future<void> _initialize() async {
+    await _loadBuses();
+  }
+
+  Future<void> _loadBuses() async {
+    _buses = null;
+    List<BusModel> buses = await _graphQLService.getBuses();
+    setState(() => _buses = buses);
+  }
  
   @override
   Widget build(BuildContext context) {
@@ -46,7 +37,7 @@ class BusListScreen extends StatelessWidget {
         title: Text('Список Автобусов'),
       ),
       body: ListView.builder(
-        itemCount: buses.length,
+        itemCount: _buses!.length,
         itemBuilder: (context, index) {
           return Card(
             // margin: EdgeInsets.all(8.0),
@@ -61,7 +52,7 @@ class BusListScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(Icons.directions_bus),
-                        Text('${buses[index].number}', style: TextStyle(fontSize: 18)),
+                        Text('${_buses![index].name}', style: TextStyle(fontSize: 18)),
                         // SizedBox(height: 4),
                       ],
                     ),
@@ -79,8 +70,8 @@ class BusListScreen extends StatelessWidget {
                       child:Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${buses[index].start}', style: TextStyle(fontSize: 16)),
-                        Text('${buses[index].finish}', style: TextStyle(fontSize: 16)),
+                        Text('${_buses![index].schedule.route!.start!.name}', style: TextStyle(fontSize: 16)),
+                        Text('${_buses![index].schedule.route!.end!.name}', style: TextStyle(fontSize: 16)),
                       ],
                     ),
                     ),
@@ -90,16 +81,13 @@ class BusListScreen extends StatelessWidget {
                     child:Center(
                       child:IconButton(
                       icon: Icon(Icons.arrow_forward),
-                      onPressed: () async {
-                      
-                      List<Map<String, dynamic>> sch = await fetchSch();
-                      
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SchListScreen(sch: sch),
-                        ),
-                      );
+                      onPressed: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SchListScreen(),
+                          ),
+                        );
                     },
                     ),
                     ),
@@ -116,28 +104,28 @@ class BusListScreen extends StatelessWidget {
 
 
 class SchListScreen extends StatelessWidget {
-  final List<Map<String, dynamic>> sch;
+  // final List<Map<String, dynamic>> sch;
 
-  SchListScreen({required this.sch});
+  // SchListScreen({required this.sch});
 
-  // final List<Map<String, dynamic>> sch = [
-  //   {
-  //     'id': 1,
-  //     'stop': {'stop_id': 101, 'stop_name': 'Станция A'},
-  //     'time': '10:00',
-  //   },
-  //   {
-  //     'id': 2,
-  //     'stop': {'stop_id': 102, 'stop_name': 'Станция B'},
-  //     'time': '10:30',
-  //   },
-  //   {
-  //     'id': 3,
-  //     'stop': {'stop_id': 103, 'stop_name': 'Станция C'},
-  //     'time': '11:00',
-  //   },
-  //   
-  // ];
+  final List<Map<String, dynamic>> sch = [
+    {
+      'id': 1,
+      'stop': {'stop_id': 101, 'stop_name': 'Станция A'},
+      'time': '10:00',
+    },
+    {
+      'id': 2,
+      'stop': {'stop_id': 102, 'stop_name': 'Станция B'},
+      'time': '10:30',
+    },
+    {
+      'id': 3,
+      'stop': {'stop_id': 103, 'stop_name': 'Станция C'},
+      'time': '11:00',
+    },
+    
+  ];
 
   @override
   Widget build(BuildContext context) {

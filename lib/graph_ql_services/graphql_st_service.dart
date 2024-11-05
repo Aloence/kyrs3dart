@@ -41,7 +41,50 @@ class StopGraphQLService{
       return [];
     }
   }
-  // getOneStop()-> List[buses]
+
+  Future<StopModel> getStopById({
+    required int stopId,
+  }) async {
+    try {
+      QueryResult result = await client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.noCache,
+          document: gql("""
+              query Query(\$stopId: Int!) {
+                getStopById(stopId: \$stopId){
+                  id
+                  name
+                }
+              }
+            """),
+          variables: {
+            "stopId":stopId,
+          },
+        ),
+      );
+
+      if (result.hasException) {
+        // print('oo[]');
+        throw Exception(result.exception);
+      } else {
+        // print(result.data);
+        Map res = result.data?['getStopById'];
+        // if (res == null || res.isEmpty) {
+        //   return null;
+        // }
+        print(res);
+        StopModel stop = StopModel.fromMap(map: res);
+        // routes.map((route)=>print(route));
+        return stop;
+      }
+    } catch (error) {
+      // #kost
+      print("mda");
+      print(error);
+      rethrow;
+      // return null;
+    }
+  }
 
   Future<bool> deletestop({required String id}) async {
     try {
@@ -103,7 +146,7 @@ class StopGraphQLService{
   }
 
   Future editStop({
-    required int id,
+    required int stopId,
     required StopInput stopInput,
   }) async {
     try {
@@ -112,15 +155,15 @@ class StopGraphQLService{
           fetchPolicy: FetchPolicy.noCache,
           document: gql(
             """
-              mutation Mutation(\$id: Int!, \$stopInput: StopInput!) {
-                editStop(stopId: \$id, stopInput: \$stopInput){
+              mutation Mutation(\$stopId: Int!, \$stopInput: StopInput!) {
+                editStop(stopId: \$stopId, stopInput: \$stopInput){
                   id
                 }
               }
             """,
           ),
           variables: {
-            "id": id,
+            "stopId": stopId,
             "stopInput": {
               "name": stopInput.name,
             }
@@ -133,86 +176,6 @@ class StopGraphQLService{
       }
     } catch (error) {
       throw Exception(error);
-    }
-  }
-
-  Future<List<StopModel>> stops({
-    int? limit,
-    List<String>? ids,
-    String? author,
-    DateTime? startDate,
-    DateTime? endDate,
-  }) async {
-    try {
-      var input = {};
-      var filter = {};
-
-      bool shouldApplyLimit = limit != null;
-      if (shouldApplyLimit) {
-        input.addAll({"limit": limit});
-      }
-
-      bool shouldApplyFilter = !(ids == null &&
-          author == null &&
-          startDate == null &&
-          endDate == null);
-      if (shouldApplyFilter) {
-        bool shouldApplyIDsFilter = ids != null;
-        if (shouldApplyIDsFilter) {
-          filter.addAll({"ids": ids});
-        }
-
-        bool shouldApplyAuthorFilter = author != null;
-        if (shouldApplyAuthorFilter) {
-          filter.addAll({"author": author});
-        }
-
-        bool shouldApplyDateRangeFilter = startDate != null && endDate != null;
-        if (shouldApplyDateRangeFilter) {
-          filter.addAll({
-            "startDate": startDate.toIso8601String(),
-            "endDate": endDate.toIso8601String()
-          });
-        }
-
-        input.addAll({"filter": filter});
-      }
-
-      QueryResult result = await client.query(
-        QueryOptions(
-          fetchPolicy: FetchPolicy.noCache,
-          document: gql("""
-           query Query(\$input: StopFiltersInput) {
-              stops(input: \$input) {
-                _id
-                author
-                title
-                year
-              }
-            }
-            """),
-          variables: {
-            'input': input,
-          },
-        ),
-      );
-
-      if (result.hasException) {
-        throw Exception(result.exception);
-      } else {
-        List? res = result.data?['stops'];
-
-        if (res == null || res.isEmpty) {
-          return [];
-        }
-
-        List<StopModel> stops =
-            res.map((stop) => StopModel.fromMap(map: stop)).toList();
-
-        return stops;
-      }
-    } catch (error) {
-      return [];
     }
   }
 }

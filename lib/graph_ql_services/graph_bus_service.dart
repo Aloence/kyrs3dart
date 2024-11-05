@@ -52,10 +52,10 @@ class BusGraphQLService {
       );
 
       if (result.hasException) {
-        print('dkooo');
+        print('resException');
         throw Exception(result.exception);
       } else {
-        print('dadada');
+        // print('dadada');
         List? res = result.data?['getBuses'];
 
         if (res == null || res.isEmpty) {

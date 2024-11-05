@@ -1,32 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:schedule_app/admin/admin_route_edit.dart';
+import 'package:schedule_app/admin/edit/admin_route_edit.dart';
+import 'package:schedule_app/graph_ql_service.dart';
 import 'package:schedule_app/graph_ql_services/graph_route_service.dart';
 import 'package:schedule_app/graph_ql_services/graph_types.dart';
 
 
 
-class RouteListScreen extends StatefulWidget {
-  const RouteListScreen({super.key});
+class AdminRoutesList extends StatefulWidget {
+  const AdminRoutesList({super.key});
 
   @override
-  State<RouteListScreen> createState() => _RouteListState();
+  State<AdminRoutesList> createState() => _RoutesListState();
 }
 
-class _RouteListState extends State<RouteListScreen>
+class _RoutesListState extends State<AdminRoutesList>
     with SingleTickerProviderStateMixin {
-  
-  
-  final RouteGraphQLService _graphQLService = RouteGraphQLService();
+
+  final GraphQLService _graphQLService = GraphQLService();
   
   List<RouteModel>? _routes;
 
   @override
   void initState() {
     super.initState();
-    _load();
+    _initialize();
   }
 
-  void _load() async {
+  Future<void> _initialize() async {
+    await _loadRoutes();
+  }
+
+  Future<void> _loadRoutes() async {
     _routes = null;
     List<RouteModel> routes = await _graphQLService.getRoutes();
     setState(() => _routes = routes);
@@ -36,23 +40,20 @@ class _RouteListState extends State<RouteListScreen>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => NewRouteScreen(),
+        builder: (context) => RouteEditScreen(),
       ),
     );
   }
-  void _editRoute(context,int id) {
+  void _editRoute(int routeId) {
       Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => NewRouteScreen(id: id),
+        builder: (context) => RouteEditScreen(routeId: routeId),
       ),
     );
-    // Логика для редактирования маршрута
-    print('Редактирование маршрута с id: $id');
   }
 
   void _deleteRoute(int id) {
-    // Логика для удаления маршрута
     print('Удаление маршрута с id: $id');
   }
 
@@ -76,18 +77,18 @@ class _RouteListState extends State<RouteListScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Маршрут ${_routes![index].name}', // Название маршрута
+                          'Маршрут ${_routes![index].name}', 
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(height: 4), // Отступ между строками
+                        SizedBox(height: 4), 
                         Text(
-                          ' ${_routes![index].start.name} - ${_routes![index].end.name}', // Начало маршрута
+                          ' ${_routes![index].start!.name} - ${_routes![index].end!.name}', 
                           style: TextStyle(fontSize: 16),
                         ),
                       ],
                     ),
                     trailing: Row(
-                      mainAxisSize: MainAxisSize.min, // Уменьшаем размер Row
+                      mainAxisSize: MainAxisSize.min, 
                       children: [
                         IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),
@@ -99,8 +100,7 @@ class _RouteListState extends State<RouteListScreen>
                         IconButton(
                           icon: Icon(Icons.edit, color: Colors.blue),
                           onPressed: () {
-            
-                            _editRoute(context,_routes![index].id);
+                            _editRoute(_routes![index].id!);
                           },
                           tooltip: 'Редактировать',
                         ),
@@ -111,14 +111,13 @@ class _RouteListState extends State<RouteListScreen>
               },
             ),
           ),
-          // Кнопка внизу экрана
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
-              onPressed: _addRoute, // Логика для добавления нового маршрута
+              onPressed: _addRoute,
               child: Text('Добавить Маршрут'),
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50), // Ширина кнопки на весь экран
+                minimumSize: Size(double.infinity, 50), 
               ),
             ),
           ),

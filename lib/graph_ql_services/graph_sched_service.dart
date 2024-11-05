@@ -67,9 +67,8 @@ class ScheduleGraphQLService {
       return [];
     }
   }
-  // getOneStop()-> List[buses]
    Future<ScheduleModel> getScheduleById({
-    required int id,
+    required int scheduleId,
   }) async {
     try {
       QueryResult result = await client.query(
@@ -108,7 +107,7 @@ class ScheduleGraphQLService {
               }
             """),
           variables: {
-            "scheduleId":id,
+            "scheduleId":scheduleId,
           },
         ),
       );
@@ -122,6 +121,7 @@ class ScheduleGraphQLService {
         // if (res == null || res.isEmpty) {
         //   return null;
         // }
+        print('sched_service');
         print(res);
         ScheduleModel schedule = ScheduleModel.fromMap(map: res);
         return schedule;

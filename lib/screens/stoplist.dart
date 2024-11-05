@@ -1,27 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:schedule_app/graph_ql_service.dart';
 import 'package:schedule_app/graph_ql_services/graph_types.dart';
-import 'package:schedule_app/graph_ql_services/graphql_st_service.dart';
 
-class StopScreen extends StatefulWidget {
-  const StopScreen({super.key});
+class StopsListScreen extends StatefulWidget {
+  const StopsListScreen({super.key});
 
   @override
-  State<StopScreen> createState() => _StopScreenState();
+  _StopsListScreenState createState() => _StopsListScreenState();
 }
 
-class _StopScreenState extends State<StopScreen>
+class _StopsListScreenState extends State<StopsListScreen>
     with SingleTickerProviderStateMixin {
-  final StopGraphQLService _graphQLService = StopGraphQLService();
+  final GraphQLService _graphQLService = GraphQLService();
 
   List<StopModel>? _stops;
 
   @override
   void initState() {
     super.initState();
-    _load();
+    _initialize();
   }
 
-  void _load() async {
+  Future<void> _initialize() async {
+    await _loadStops();
+  }
+
+
+  Future<void> _loadStops() async {
     _stops = null;
     List<StopModel> stops = await _graphQLService.getStops();
     setState(() => _stops = stops);

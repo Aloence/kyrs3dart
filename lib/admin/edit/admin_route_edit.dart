@@ -1,42 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:schedule_app/graph_ql_services/graph_route_service.dart';
+import 'package:schedule_app/graph_ql_service.dart';
 import 'package:schedule_app/graph_ql_services/graph_types.dart';
-import 'package:schedule_app/graph_ql_services/graphql_st_service.dart';
 
-class NewRouteScreen extends StatefulWidget {
-  int? id ;
-  NewRouteScreen({this.id});
+class RouteEditScreen extends StatefulWidget {
+  int? routeId ;
+  RouteEditScreen({this.routeId});
   @override 
-  _NewRouteScreenState createState() => _NewRouteScreenState();
+  _RouteEditScreenState createState() => _RouteEditScreenState();
 }
 
-class _NewRouteScreenState extends State<NewRouteScreen> {
-  // #kost
-  final RouteGraphQLService _graphQLService = RouteGraphQLService();
-  final StopGraphQLService _stopGraphQLService = StopGraphQLService();
+class _RouteEditScreenState extends State<RouteEditScreen> {
+  
+  final GraphQLService _graphQLService = GraphQLService();
 
   List<StopModel>? _availableStops;  
   List<StopModel> _stops = [];
-  final TextEditingController _nameController = TextEditingController();
 
-  void _loadRoute(int id) async{
-    RouteModel route = await _graphQLService.getRouteById(id:id);
+  final TextEditingController _nameController = TextEditingController();
+  
+  @override
+  void initState() { 
+    super.initState();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await _loadStops();
+    if (widget.routeId != null) {
+      await _loadRoute(widget.routeId!); 
+    }
+  }
+  Future<void> _loadRoute(int routeId) async{
+    RouteModel route = await _graphQLService.getRouteById(routeId:routeId);
     _nameController.text = route.name ?? '';
-    _stops = route.stops ?? [];
+    setState(() {
+      _stops = route.stops ?? [];
+    });
+   
+    
     
   }
-  void _loadStops() async {
+  Future<void> _loadStops() async {
     _availableStops = null;
-    List<StopModel> availableStops = await _stopGraphQLService.getStops();
+    List<StopModel> availableStops = await _graphQLService.getStops();
     setState(() => _availableStops = availableStops);
   }
 
-  RouteInput _toRouteInput(){
+  RouteInput _getRouteInput(){
     List<int> stopIds = _stops.map((stop) => stop.id).toList();
     return RouteInput(name: _nameController.text, stopIds: stopIds);
   }
-  void _createRoute() async{
-    RouteInput routeInput = _toRouteInput();
+
+  Future<void> _createRoute() async{
+    RouteInput routeInput = _getRouteInput();
     await _graphQLService.createRoute(routeInput: routeInput);
   }
 
@@ -46,20 +62,9 @@ class _NewRouteScreenState extends State<NewRouteScreen> {
   }
 
 
-  @override
-  void initState() {
-    // #mb awaits here?
-    super.initState();
-    _loadStops();
-    if (widget.id != null) {
-      _loadRoute(widget.id!); 
-    }
-  }
-  // route = RouteModel(id: id, start: start, end: end);
   void _addStop(StopModel stop) {
     setState(() {
       _stops.add(stop);
-      // _stops.add(stop);
     });
     Navigator.of(context).pop(); // Закрываем список остановок после выбора
   }
@@ -67,7 +72,6 @@ class _NewRouteScreenState extends State<NewRouteScreen> {
   void _removeStop(StopModel stop) {
     setState(() {
       _stops.remove(stop);
-      // _stops.remove(stop);
     });
   }
 
@@ -78,9 +82,8 @@ class _NewRouteScreenState extends State<NewRouteScreen> {
         return ListView.builder(
           itemCount: _availableStops!.length,
           itemBuilder: (context, index) {
-            // Проверяем, добавлена ли остановка в маршрут
             if (_stops.contains(_availableStops![index])) {
-              return Container(); // Если остановка уже добавлена, не отображаем её
+              return Container(); 
             }
             return ListTile(
               title: Text(_availableStops![index].name),
@@ -95,9 +98,6 @@ class _NewRouteScreenState extends State<NewRouteScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
-    // _nameController.text = route?.name ?? '';
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Маршрут Остановок'),
@@ -107,7 +107,7 @@ class _NewRouteScreenState extends State<NewRouteScreen> {
         child: Column(
           children: [
             TextField(
-              controller: _nameController, // Привязка контроллера к текстовому полю
+              controller: _nameController, 
               decoration: InputDecoration(
                 labelText: 'Имя',
                 border: OutlineInputBorder(),
@@ -123,7 +123,7 @@ class _NewRouteScreenState extends State<NewRouteScreen> {
                 itemCount: _stops.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    key: ValueKey(_stops[index].id), // Уникальный ключ
+                    key: ValueKey(_stops[index].id),
                     title: Text(_stops[index].name),
                     trailing: IconButton(
                       icon: Icon(Icons.delete, color: Colors.red),
@@ -133,7 +133,7 @@ class _NewRouteScreenState extends State<NewRouteScreen> {
                 },
                 onReorder: (oldIndex, newIndex) {
                   setState(() {
-                    if (newIndex > oldIndex) newIndex--; // Корректируем индекс
+                    if (newIndex > oldIndex) newIndex--; 
                     final StopModel movedStop = _stops.removeAt(oldIndex);
                     _stops.insert(newIndex, movedStop);
                   });
@@ -147,14 +147,14 @@ class _NewRouteScreenState extends State<NewRouteScreen> {
               onPressed: _showStopSelection,
               child: Text('Добавить Остановку'),
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50), // Ширина кнопки на весь экран
+                minimumSize: Size(double.infinity, 50), 
               ),
             ),
             ElevatedButton(
               onPressed: _createRoute,
               child: Text('Сохранить Маршрут'),
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50), // Ширина кнопки на весь экран
+                minimumSize: Size(double.infinity, 50),
               ),
             ),
           ],

@@ -51,7 +51,7 @@ class RouteGraphQLService {
   }
 
   Future<RouteModel> getRouteById({
-    required int id,
+    required int routeId,
   }) async {
     try {
       QueryResult result = await client.query(
@@ -78,7 +78,7 @@ class RouteGraphQLService {
               }
             """),
           variables: {
-            "routeId":id,
+            "routeId":routeId,
           },
         ),
       );

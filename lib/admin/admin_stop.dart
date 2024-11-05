@@ -1,54 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:schedule_app/admin/admin_stop_edit.dart';
+import 'package:schedule_app/admin/edit/admin_stop_edit.dart';
+import 'package:schedule_app/graph_ql_service.dart';
 import 'package:schedule_app/graph_ql_services/graph_types.dart';
-import 'package:schedule_app/graph_ql_services/graphql_st_service.dart';
 
 
 
-class StopListScreen extends StatefulWidget {
-  const StopListScreen({super.key});
+class AdminStopsList extends StatefulWidget {
+  const AdminStopsList({super.key});
 
   @override
-  State<StopListScreen> createState() => _StopListState();
+  State<AdminStopsList> createState() => _StopsListState();
 }
 
-class _StopListState extends State<StopListScreen>
+class _StopsListState extends State<AdminStopsList>
     with SingleTickerProviderStateMixin {
   
-  final StopGraphQLService _graphQLService = StopGraphQLService();
+  final GraphQLService _graphQLService = GraphQLService();
   
   List<StopModel>? _stops;
 
   @override
   void initState() {
     super.initState();
-    _load();
+    _initialize();
   }
 
-  void _load() async {
+  Future<void> _initialize() async {
+    await _loadStops();
+  }
+
+  Future<void> _loadStops() async {
     _stops = null;
     List<StopModel> stops = await _graphQLService.getStops();
     setState(() => _stops = stops);
   }
 
-  void _addStop(context){
+  void _createStop(){
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => StopEditScreen(stop:null),
+        builder: (context) => StopEditScreen(),
       ),
     );
   }
-  void _editStop(context,StopModel stop) {
+  
+  void _editStop(StopModel stop) {
       Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => StopEditScreen(stop:stop),
+        builder: (context) => StopEditScreen(stopId: stop.id),
       ),
     );
   }
+  
   void _deleteStop(int id) {
-    // Логика для удаления остановки
     print('Удаление остановки с id: $id');
   }
 
@@ -84,7 +89,7 @@ class _StopListState extends State<StopListScreen>
                       IconButton(
                         icon: Icon(Icons.edit, color: Colors.blue),
                         onPressed: () {
-                          _editStop(context,_stops![index]);
+                          _editStop(_stops![index]);
                         },
                         tooltip: 'Редактировать',
                       ),
@@ -95,18 +100,18 @@ class _StopListState extends State<StopListScreen>
               },
             ),
           ),
-          // Кнопка внизу экрана
+         
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               onPressed: () {
-                // Логика для добавления новой остановки
-                _addStop(context);
+           
+                _createStop();
                 print('Добавление новой остановки');
               },
               child: Text('Добавить Остановку'),
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50), // Ширина кнопки на весь экран
+                minimumSize: Size(double.infinity, 50), 
               ),
             ),
           ),

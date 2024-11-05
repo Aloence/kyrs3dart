@@ -1,57 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:schedule_app/admin/admin_schedule_edit.dart';
-import 'package:schedule_app/graph_ql_services/graph_sched_service.dart';
+import 'package:schedule_app/admin/edit/admin_schedule_edit.dart';
+import 'package:schedule_app/graph_ql_service.dart';
 import 'package:schedule_app/graph_ql_services/graph_types.dart';
 
 
-class ScheduleListScreen extends StatefulWidget {
-  const ScheduleListScreen({super.key});
+class AdminSchedulesList extends StatefulWidget {
+  const AdminSchedulesList({super.key});
 
   @override
-  State<ScheduleListScreen> createState() => _ScheduleListState();
+  _SchedulesListState createState() => _SchedulesListState();
 }
 
-class _ScheduleListState extends State<ScheduleListScreen>
-    with SingleTickerProviderStateMixin {
-  final ScheduleGraphQLService _graphQLService = ScheduleGraphQLService();
+class _SchedulesListState extends State<AdminSchedulesList>
+  with SingleTickerProviderStateMixin{
+    
+  final GraphQLService _graphQLService = GraphQLService();
 
   List<ScheduleModel>? _schedules;
 
   @override
   void initState() {
     super.initState();
-    _load();
+    _initialize();
   }
 
-  void _load() async {
+  Future<void> _initialize() async {
+    await _loadSchedules();
+  }
+
+  Future<void> _loadSchedules() async {
     _schedules = null;
     List<ScheduleModel> schedules = await _graphQLService.getSchedules();
     setState(() => _schedules = schedules);
   }
 
-  void _editSchedule(int id) {
-    // // Логика для редактирования расписания
+  void _editSchedule(int scheduleId) {
      Navigator.push(
       context,
       MaterialPageRoute(  
-        builder: (context) => NewScheduleScreen(id: id),
+        builder: (context) => ScheduleEditScreen(scheduleId: scheduleId),
       ),
     );
-    print('Редактирование расписания с id: $id');
   }
 
   void _addSchedule(){
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => NewScheduleScreen(),
+        builder: (context) => ScheduleEditScreen(),
       ),
     );
   }
 
   void _deleteSchedule(int id) {
-    // // Логика для удаления расписания
-    // print('Удаление расписания с id: $id');
   }
 
   @override
@@ -73,22 +74,23 @@ class _ScheduleListState extends State<ScheduleListScreen>
                     children: [
                       SizedBox(height: 4),
                       Text(
-                        '${_schedules![index].name}', // Начало и конец расписания
+                        '${_schedules![index].name}',
                         style: TextStyle(fontSize: 20),
                       ),
                       Text(
-                        '${_schedules![index].start} - ${_schedules![index].end}', // Начало и конец расписания
+                        '${_schedules![index].start} - ${_schedules![index].end}', 
                         style: TextStyle(fontSize: 16),
                       ), 
                       Text(
-                        '${_schedules![index].route.name} | ${_schedules![index].route.start.name} - ${_schedules![index].route.end.name}', // Начало и конец маршрута
+                        '${_schedules![index].route!.name} |'
+                        +'${_schedules![index].route!.start!.name} - ${_schedules![index].route!.end!.name}', 
                         style: TextStyle(fontSize: 16),
                       ),
                       
                     ],
                   ),
                   trailing: Row(
-                    mainAxisSize: MainAxisSize.min, // Уменьшаем размер Row
+                    mainAxisSize: MainAxisSize.min, 
                     children: [
                       IconButton(
                         icon: Icon(Icons.delete, color: Colors.red),
@@ -100,7 +102,7 @@ class _ScheduleListState extends State<ScheduleListScreen>
                       IconButton(
                         icon: Icon(Icons.edit, color: Colors.blue),
                         onPressed: () {
-                          _editSchedule(_schedules![index].id);
+                          _editSchedule(_schedules![index].id!);
                         },
                         tooltip: 'Редактировать',
                       ),
@@ -117,7 +119,7 @@ class _ScheduleListState extends State<ScheduleListScreen>
               onPressed: _addSchedule, 
               child: Text('Добавить Маршрут'),
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50), // Ширина кнопки на весь экран
+                minimumSize: Size(double.infinity, 50), 
               ),
             ),
           ),

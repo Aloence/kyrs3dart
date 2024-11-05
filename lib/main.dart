@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:schedule_app/screens/profile.dart';
 import 'package:schedule_app/screens/stoplist.dart';
-import 'package:schedule_app/admin/adminpanel.dart';
+import 'package:schedule_app/screens/adminpanel.dart';
 import 'screens/buslist.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 void main() {
@@ -30,8 +30,8 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0; 
 
   final List<Widget> _screens = [
-    // BusListScreen(),
-    // StopScreen(),
+    BusesListScreen(),
+    StopsListScreen(),
     // ProfileScreen(),
     AdminPanel(),
     // HomeScreen(),
@@ -65,7 +65,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Профиль',
+            label: 'Админка',
           ),
           // BottomNavigationBarItem(
           //   icon: Icon(Icons.person),
@@ -74,7 +74,7 @@ class _MainScreenState extends State<MainScreen> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue,
-        onTap: _onItemTapped, // Обработчик нажатий
+        onTap: _onItemTapped, 
       ),
     );
   }

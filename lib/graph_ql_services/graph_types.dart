@@ -19,17 +19,17 @@ class StopModel {
 }
 
 class RouteModel {
-  final int id;
+  final int? id;
   final String? name;
   
-  final StopModel start;
-  final StopModel end;
+  final StopModel? start;
+  final StopModel? end;
   List<StopModel>? stops;
 
   RouteModel({
-    required this.id,
-    required this.start,
-    required this.end,
+    this.id,
+    this.start,
+    this.end,
     this.name,
     this.stops,
   });
@@ -71,28 +71,28 @@ class SchedulStopModel {
 }
 
 class ScheduleModel {
-  final String start;
-  final String end;
-  final String name;
-  final int id;
+  final String? start;
+  final String? end;
+  final String? name;
+  final int? id;
 
-  final RouteModel route;
+  final RouteModel? route;
   final List<SchedulStopModel>? schedule;
 
 
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true; // Проверка на идентичность
-    if (other is! ScheduleModel) return false; // Проверка на тип
-    return id == other.id; // Сравнение по ID
-  }
+  // @override
+  // bool operator ==(Object other) {
+  //   if (identical(this, other)) return true; 
+  //   if (other is! ScheduleModel) return false; 
+  //   return id == other.id; 
+  // }
   ScheduleModel({
-    required this.start,
-    required this.end,
-    required this.id,
-    required this.route,
-    required this.name,
-    this.schedule,
+     this.start,
+     this.end,
+     this.id,
+     this.route,
+     this.name,
+     this.schedule,
   });
   static ScheduleModel fromMap({required Map map}) {
     var scheduleStopsList = (map['schedule'] as List)
@@ -131,7 +131,7 @@ class BusModel{
 
 class StopInput {
   final String name;
-
+  
   StopInput({
     required this.name,
   });
